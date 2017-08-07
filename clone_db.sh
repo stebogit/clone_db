@@ -20,17 +20,20 @@
 #################
 
 # Set variables
+# -------------
+# remotes
 SSH_USER=ssh_user
 SSH_REMOTE_HOST=ssh_remotehost
-
+# locals
 REMOTE_DB=remoteDbName
 COPY_DB=localDbName
 USER=root
 PASS="yourpassword"
 ERROR=/clone_db_error.log
 
+# script
 echo "Copying..."
-ssh -C $SSH_USER@$SSH_REMOTE_HOST && mysql -u$USER -p$PASS -e "DROP DATABASE IF EXISTS `$COPY_DB`;" && mysql -u$USER -p$PASS -e "CREATE DATABASE `$COPY_DB`;" && mysqldump --force --log-error=$ERROR -u$USER -p$PASS $REMOTE_DB | ssh -C $SSH_USER@$SSH_REMOTE_HOST mysql -u$USER -p$PASS $COPY_DB
+mysql -u$USER -p$PASS -e "DROP DATABASE IF EXISTS `$COPY_DB`;" --force && mysql -u$USER -p$PASS -e "CREATE DATABASE `$COPY_DB`;" && ssh -l $SSH_USER@$SSH_REMOTE_HOST mysqldump --force --log-error=$ERROR -u$USER -p$PASS $REMOTE_DB | ssh -C $SSH_USER@$SSH_REMOTE_HOST mysql -u$USER -p$PASS $COPY_DB
 echo "Copy completed."
 
 # End script
